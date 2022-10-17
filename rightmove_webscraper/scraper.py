@@ -161,9 +161,11 @@ class RightmoveData:
             page_count = 42
         return page_count
 
+
+    #needs work - this doesn't work in all cases 
     def _parse_image_text(self, raw_text):
         lines = raw_text.split("\n")
-        checks = ["sq.m.","sq.m","sq.ft.","sq.ft","sqm","sq m", "sq ft"]
+        checks = ["sq.m.","sq.m","sq.ft.","sq.ft","sqm","sq m", "sq ft", "\u00b2", "sq. m."]
         for line in lines:
             if any(check in line.lower() for check in checks):
                 return line.lower()
@@ -200,9 +202,9 @@ class RightmoveData:
         addresses = tree.xpath(xp_addresses)
         base = "http://www.rightmove.co.uk"
         weblinks = [f"{base}{tree.xpath(xp_weblinks)[w]}" for w in range(len(tree.xpath(xp_weblinks)))]
-        # weblinks = list(filter(lambda item: item != base, weblinks))
+        weblinks = list(filter(lambda item: item != base, weblinks))
         agent_urls = [f"{base}{tree.xpath(xp_agent_urls)[a]}" for a in range(len(tree.xpath(xp_agent_urls)))]
-        # agent_urls = list(filter(lambda item: item != base, agent_urls))
+        agent_urls = list(filter(lambda item: item != base, agent_urls))
 
 
 #/floorplan?activePlan=1&channel=RES_BUY
@@ -253,7 +255,7 @@ class RightmoveData:
         temp_df.columns = columns
 
         # Drop empty rows which come from placeholders in the html:
-        # temp_df = temp_df[temp_df["address"].notnull()]
+        temp_df = temp_df[temp_df["address"].notnull()]
 
         return temp_df
 
@@ -283,6 +285,7 @@ class RightmoveData:
 
         return self._clean_results(results)
 
+    #is there any way to get the postcode from google maps?
     @staticmethod
     def _clean_results(results: pd.DataFrame):
         # Reset the index:
